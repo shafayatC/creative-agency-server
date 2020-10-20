@@ -16,6 +16,8 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-fileupload": "^1.2.0",
-    "mongodb": "^3.6.2"
+    "mongodb": "^3.6.2",
+    "nodemailer": "^6.4.14",
+    "nodemailer-smtp-transport": "^2.7.4"
   }
 }

@@ -2,6 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser'); 
 const fileUpload = require('express-fileupload');
+const nodemailer = require('nodemailer');
+const smtpTransport = require('nodemailer-smtp-transport');
+
 require('dotenv').config()
 // mongodb
 const MongoClient = require('mongodb').MongoClient;
@@ -9,7 +12,15 @@ const ObjectId = require('mongodb').ObjectId;
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.q1oby.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-
+const transporter = nodemailer.createTransport(smtpTransport({
+  service: 'gmail',
+  host: 'smtp.gmail.com',
+  auth: {
+    user: process.env.MAIL_USER,
+    pass: process.env.MAIL_PASS
+  }
+})
+);
 const app = express(); 
 // default options
 app.use(fileUpload());
@@ -17,7 +28,7 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
-
+// server connected start
 client.connect(err => {
   const adminCollection = client.db(process.env.DB_NAME).collection("adminList");
   const serviceCollection = client.db(process.env.DB_NAME).collection("service");
@@ -40,7 +51,6 @@ client.connect(err => {
         console.log("body check : " +reg.body.email); 
         adminCollection.find(reg.body)
         .toArray((err, documents) => {
-            console.log(documents)
             res.send(documents.length > 0);
         })
 
@@ -154,11 +164,33 @@ client.connect(err => {
     })
 
   })
+
+  //mail send
+  app.post('/sendMail', (req,res)=> {
+
+    var mailOptions = {
+      from: 'shafayat18@gmail.com',
+      to: 'shafayat18@gmail.com',
+      subject: req.body.name,
+      text: req.body.msg,
+    };
+    
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error);
+      } else {
+        res.send(1>0)
+      }   
+    });
+  })
+
    //root url 
     app.get('/', (reg, res) => {
         res.send("products");
     })
  
+
+
 });
 
 
