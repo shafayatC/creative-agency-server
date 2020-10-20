@@ -39,7 +39,7 @@ client.connect(err => {
     app.post('/addAdmin', (reg, res)=>{
         const addAdmin = reg.body;
         console.log(reg.body);
-        serviceCollection.insertOne(addAdmin)
+        adminCollection.insertOne(addAdmin)
         .then(function(result) {
           res.send(result.insertedCount > 0);
         })
